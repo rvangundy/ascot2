@@ -21,17 +21,21 @@ describe('Context', function() {
     app.use(function(el) {
         var ctx = ascot.createContext(el);
 
-        ctx.add('<h1 class="testH1">Hello World!</h1>');
-        ctx.add('<ul class="testUL"></ul>', function(el, options) {
+        ctx.add('<div class="top"></div>', function(el) {
             var ctx = ascot.createContext(el);
 
-            ctx.add('<li>Hello</li><li>' + options.name + '</li>');
-        }, { name : 'Ryan' });
+            ctx.add('<h1 class="testH1">Hello World!</h1>');
+            ctx.add('<ul class="testUL"></ul>', function(el, options) {
+                var ctx = ascot.createContext(el);
+
+                ctx.add('<li>Hello</li><li>' + options.name + '</li>');
+            }, { name : 'Ryan' });
+        });
     });
 
     app.appendTo(document.body);
 
-    describe('use()', function() {
+    describe('use() & add()', function() {
 
         it('should deploy to the document body', function() {
             assert.equal(app.element, document.body);
@@ -47,10 +51,42 @@ describe('Context', function() {
             assert.ok(document.body.querySelector('.testUL'));
         });
 
-        it ('should pass options in to a controller', function() {
+        it('should pass options in to a controller', function() {
             var list = document.body.querySelector('.testUL');
 
             assert.equal(list.children[1].innerHTML, 'Ryan');
+        });
+
+    });
+
+    describe('remove()', function() {
+        it('should remove itself from its parent', function() {
+            ascot.createContext(document.body.querySelector('.top')).remove();
+            assert.notOk(document.body.querySelector('.top'));
+        });
+    });
+
+    describe('merge()', function() {
+        var el = document.createElement('div');
+        var ctx = ascot.createContext(el);
+
+        el.classList.add('testA');
+
+        ctx.merge('<div class="testB" data-test="5"><span>ChildA</span><span>ChildB</span></div>');
+
+        it('should merge class lists', function() {
+            assert.ok(el.classList.contains('testA'));
+            assert.ok(el.classList.contains('testB'));
+        });
+
+        it('should merge data-* attributes', function() {
+            assert.equal(el.getAttribute('data-test'), 5);
+        });
+
+        it('should merge child elements', function() {
+            assert.equal(el.children.length, 2);
+            assert.equal(el.children[0].innerHTML, 'ChildA');
+            assert.equal(el.children[1].innerHTML, 'ChildB');
         });
     });
 });

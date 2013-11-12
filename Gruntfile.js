@@ -80,7 +80,6 @@ module.exports = function (grunt) {
 
     grunt.registerTask('release', [
         'jshint',
-        'test',
         'bump'
     ]);
 };

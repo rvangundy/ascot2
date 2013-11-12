@@ -36,7 +36,7 @@ module.exports = function (grunt) {
             },
             test: {
                 src  : ['test/test.js'],
-                dest : 'test/index.js',
+                dest : '.tmp/index.js',
                 options : {
                     debug : true
                 }

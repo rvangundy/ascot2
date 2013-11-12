@@ -7,6 +7,9 @@
 var Context = require('./Context');
 var Model   = require('./Model');
 
+// classList polyfill still necessary for some targets
+require('../bower_components/html5-polyfills/classList');
+
 /************************
  *  Context Handling  *
  ************************/

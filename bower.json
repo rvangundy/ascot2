@@ -1,9 +1,12 @@
 {
   "name": "ascot2",
   "version": "0.0.1",
-  "main":"scripts/ascot.js",
+  "main": "scripts/ascot.js",
   "devDependencies": {
-    "mocha" : "~1.13.0",
-    "chai"  : "~1.8.0"
+    "mocha": "~1.13.0",
+    "chai": "~1.8.0"
+  },
+  "dependencies": {
+    "html5-polyfills": "*"
   }
 }

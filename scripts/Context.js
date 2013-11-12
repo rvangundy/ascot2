@@ -114,11 +114,55 @@ function insertBefore(target) {
  * Removes the context from the target element, adding it to a document fragment
  */
 function remove() {
-    var element = document.createDocumentFragment();
+    var fragment = document.createDocumentFragment();
 
-    element.appendChild(this.element);
+    fragment.appendChild(this.element);
+}
 
-    this.element = element;
+/**
+ * Merges the HTML string content with the current context
+ * @param {String} innerHTML Some new HTML to merge with the current context
+ */
+function mergeElements(innerHTML) {
+    var newElement, attributes, attr, classList, children;
+    var element = this.element;
+    var div     = document.createElement('div');
+
+    // Handle fragments
+    if (!element.tagName) {
+        div.innerHTML = innerHTML;
+        element.appendChild(div.firstChild);
+        return;
+    }
+
+    // Merge elements
+    div.innerHTML = innerHTML;
+    if (div.children.length === 1) {
+        newElement = div.firstChild;
+        attributes = Array.prototype.slice.call(newElement.attributes, 0);
+
+        // Merge all data-* attributes
+        for (var i = 0, len = attributes.length; i < len; i += 1) {
+            attr = attributes[i];
+            if (attr.name.indexOf('data') >= 0) {
+                element.setAttribute(attr.name, attr.value);
+            }
+        }
+
+        // Merge class lists
+        classList = newElement.classList;
+        for (var j = 0, lenJ = classList.length; j < lenJ; j += 1) {
+            element.classList.add(classList[j]);
+        }
+
+        // Merge child nodes
+        children = Array.prototype.slice.call(newElement.childNodes, 0);
+        for (var k = 0, lenK = children.length; k < lenK; k += 1) {
+            element.appendChild(children[k]);
+        }
+    }
+
+    return this;
 }
 
 /*******************
@@ -182,7 +226,8 @@ Context.prototype = {
     remove       : remove,
     select       : select,
     selectAll    : selectAll,
-    attr         : getAttribute
+    attr         : getAttribute,
+    merge        : mergeElements
 };
 
 /*************

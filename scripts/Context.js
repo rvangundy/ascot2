@@ -1,25 +1,10 @@
 'use strict';
 
-/***************
- *  Utilities  *
- ***************/
+/******************
+ *  Dependencies  *
+ ******************/
 
-function isFunction(functionToCheck) {
-    var getType = {};
-    return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
-}
-
-function isObject(objectToCheck) {
-    return objectToCheck === Object(objectToCheck);
-}
-
-function merge(objA, objB) {
-    for (var i in objB) {
-        objA[i] = objB[i];
-    }
-
-    return objA;
-}
+var defineAPI = require('defineAPI');
 
 /*****************
  *  Composition  *
@@ -28,28 +13,14 @@ function merge(objA, objB) {
 /**
  * Specifies the use of additional controllers by this context
  * @param {Function} controller A controller to use in this context
- * @param {Object} options An object representing various options to pass to controllers
  */
 function use(/* arguments */) {
-    var arg;
-    var controllers = [];
-    var options     = {};
+    var controllers = Array.prototype.slice.call(arguments, 0);
     var element     = this.element = this.element || document.createDocumentFragment();
 
-    // Collect controllers and merge options
-    for (var i = 0, len = arguments.length; i < len; i += 1) {
-        arg = arguments[i];
-        if (isFunction(arg)) {
-            // Asynchronously call the function
-            controllers.push(arg);
-        } else if (isObject(arg)) {
-            merge(options, arg);
-        }
-    }
-
-    // Call each controller, passing options in to each
-    for (var j = 0, lenJ = controllers.length; j < lenJ; j += 1) {
-        controllers[j](element, options);
+    // Call each controller
+    for (var i = 0, len = controllers.length; i < len; i += 1) {
+        controllers[i](element);
     }
 
     return this;
@@ -59,7 +30,7 @@ function use(/* arguments */) {
  * Adds a new innerHTML string to be used when building this context
  * @param {String}   innerHTML   A new HTML string to add to this context
  * @param {Function} controller  A controller to use in this context
- * @param {Object}   options     An object representing various options to pass to controllers
+ * @return {Element}             The element or elements that have just been created
  */
 function add(innerHTML) {
     var children;
@@ -80,7 +51,7 @@ function add(innerHTML) {
         use.apply({ element : children[i]}, args);
     }
 
-    return this;
+    return children.length === 1 ? children[0] : children;
 }
 
 /**
@@ -218,7 +189,7 @@ var Context = function (element) {
  *  Prototype  *
  ***************/
 
-Context.prototype = {
+Context.prototype = defineAPI({
     use          : use,
     add          : add,
     appendTo     : appendTo,
@@ -228,7 +199,7 @@ Context.prototype = {
     selectAll    : selectAll,
     attr         : getAttribute,
     merge        : mergeElements
-};
+});
 
 /*************
  *  Exports  *

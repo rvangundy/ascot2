@@ -7,9 +7,6 @@
 var Context = require('./Context');
 var Model   = require('./Model');
 
-// classList polyfill still necessary for some targets
-require('../bower_components/html5-polyfills/classList');
-
 /************************
  *  Context Handling  *
  ************************/
@@ -19,7 +16,7 @@ require('../bower_components/html5-polyfills/classList');
  * @param {Element} element An HTML element
  */
 function createContext(element) {
-	return new Context(element);
+    return new Context(element);
 }
 
 /********************
@@ -33,11 +30,11 @@ var MODELS = {};
  * @param {String} url The url pointing to the model's data resource
  */
 function createModel(url) {
-	if (MODELS[url]) { return MODELS[url]; }
-	else {
-		MODELS[url] = new Model(url);
-		return MODELS[url];
-	}
+    if (MODELS[url]) { return MODELS[url]; }
+    else {
+        MODELS[url] = new Model(url);
+        return MODELS[url];
+    }
 }
 
 /*********
@@ -45,8 +42,8 @@ function createModel(url) {
  *********/
 
 var ascot = {
-	createContext : createContext,
-	createModel   : createModel
+    createContext : createContext,
+    createModel   : createModel
 };
 
 /*************

@@ -1,11 +1,17 @@
 'use strict';
 
+/******************
+ *  Dependencies  *
+ ******************/
+
+var defineAPI = require('defineAPI');
+
 /****************
  *  Properties  *
  ****************/
 
 /**
- * @property {Boolean} preferOnline Whether to always attempt updating from the online location 
+ * @property {Boolean} preferOnline Whether to always attempt updating from the online location
  * rather than retrieve from localStorage
  */
 
@@ -86,7 +92,7 @@ function parse(json) {
     // Performs optional processing steps to modify the structure of the data
     if (this.process) { data = this.process(data); }
 
-    for (var i in data) { this[i] = data[i]; }
+    this.data = data;
 }
 
 /**
@@ -138,7 +144,7 @@ function loadDirectData(data) {
  * @param {String} path A period-delimited path to some data
  */
 function resolve(path) {
-    var value = this;
+    var value = this.data;
 
     path = path.split('.');
 
@@ -156,6 +162,7 @@ function resolve(path) {
  */
 function set(/* arguments */) {
     var path, addr, data, target, key;
+    var thisData = this.data;
 
     // Adjust for arguments
     if (arguments.length === 2) {
@@ -165,12 +172,17 @@ function set(/* arguments */) {
         data = arguments[0];
     }
 
+    // Handle index-referenced data change
+    if (isFinite(path)) {
+        this.data[path] = data;
+    }
+
     // Handle path-referenced data change
-    if (path) {
+    else if (path) {
         addr   = path;
         addr   = addr.split('.');
         key    = addr.pop();
-        target = this;
+        target = thisData;
 
         for (var i=0, len=addr.length; i<len; i+=1) {
             target = target[addr[i]];
@@ -181,9 +193,7 @@ function set(/* arguments */) {
 
     // Handle full data change
     else {
-        for (var j in data) {
-            this[j] = data[j];
-        }
+        this.data = data;
     }
 
     emit.call(this);
@@ -197,9 +207,9 @@ function set(/* arguments */) {
  * Calls all callbacks registered to receive data change events
  */
 function emit() {
-    var listeners = this.listeners;
+    var listeners = this.listeners.slice(0);
 
-    for (var i = listeners.length - 1; i >= 0; i -= 1) {
+    for (var i = 0, len = listeners.length; i < len; i += 1) {
         listeners[i](this);
     }
 }
@@ -243,24 +253,26 @@ function removeAllListeners() {
     this.listeners = [];
 }
 
-/****************
- *  Controller  *
- ****************/
+/*************
+ *  Binding  *
+ *************/
 
 /**
- * Creates an ascot-compatible controller interface for the model
- * @param {Function} callback A controller callback to associate with the model
+ * Creates a model binding that may be applied as a controller to contexts
+ * @param {Function} controller One or more element/model controllers
  */
-function createController(/* callbacks */) {
-    var args = arguments;
+function createController(/* controllers */) {
+    var controllers = Array.prototype.slice.call(arguments, 0);
 
-    var controller = function(element, options) {
-        this.addListener(function(model) {
-            for (var i = 0, len = args.length; i < len; i += 1) {
-                args[i](model, element, options);
+    function controller(element) {
+        function listener(model) {
+            for (var i = 0, len = controllers.length; i < len; i += 1) {
+                controllers[i](element, model);
             }
-        });
-    };
+        }
+
+        this.addListener(listener);
+    }
 
     return controller.bind(this);
 }
@@ -270,47 +282,14 @@ function createController(/* callbacks */) {
  *****************/
 
 var Model = function(src, options) {
-    options = options || {};
+    options           = options || {};
+    this.storeLocal   = options.storeLocal;
+    this.preferOnline = options.preferOnline;
+    this.process      = options.process;
+    this.src          = src;
+    this.listeners    = [];
 
-    Object.defineProperties(this, {
-        'storeLocal' : {
-            value        : options.storeLocal,
-            writable     : true,
-            enumerable   : false,
-            configurable : false
-        },
-        'preferOnline' : {
-            value        : options.preferOnline,
-            writable     : true,
-            enumerable   : false,
-            configurable : false
-        },
-        'process' : {
-            value        : options.process,
-            writable     : true,
-            enumerable   : false,
-            configurable : false
-        },
-        'src' : {
-            value        : src,
-            writable     : true,
-            enumerable   : false,
-            configurable : false
-        },
-        'listeners' : {
-            value        : [],
-            writable     : true,
-            enumerable   : false,
-            configurable : false
-        },
-        'isLoaded' : {
-            value        : false,
-            writable     : true,
-            enumerable   : false,
-            configurable : false
-        }
-    });
-
+    // Retrieve resource
     if (src) {
         if (typeof src === 'string') {
             load.call(this, src);
@@ -326,7 +305,14 @@ var Model = function(src, options) {
  *  Prototype  *
  ***************/
 
-Model.prototype = {
+Model.prototype = defineAPI({
+    storeLocal         : null,
+    preferOnline       : null,
+    process            : null,
+    src                : null,
+    isLoaded           : false,
+    data               : null,
+    listeners          : { val : null, wrt : true, enm : false, cfg : false },
     store              : store,
     load               : load,
     set                : set,
@@ -335,7 +321,7 @@ Model.prototype = {
     removeListener     : removeListener,
     removeAllListeners : removeAllListeners,
     createController   : createController
-};
+});
 
 /*************
  *  Exports  *

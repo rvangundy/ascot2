@@ -4,7 +4,7 @@
  *  Dependencies  *
  ******************/
 
-var defineAPI = require('defineAPI');
+var defineAPI = require('./defineAPI');
 
 /*****************
  *  Composition  *

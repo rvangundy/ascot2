@@ -31,9 +31,6 @@ module.exports = function (grunt) {
             }
         },
         browserify: {
-            options : {
-                transform: ['debowerify']
-            },
             test: {
                 src  : ['test/test.js'],
                 dest : '.tmp/index.js',
@@ -76,6 +73,11 @@ module.exports = function (grunt) {
         'connect:test',
         'open:test',
         'watch'
+    ]);
+
+    grunt.registerTask('default', [
+        'jshint',
+        'browserify'
     ]);
 
     grunt.registerTask('release', [

@@ -15,8 +15,28 @@ var Model   = require('./Model');
  * Creates a new context object with the given element
  * @param {Element} element An HTML element
  */
-function createContext(element) {
-    return new Context(element);
+function createContext(/* arguments */) {
+    var ctx, div;
+    var args = Array.prototype.slice.call(arguments, 0);
+    var el   = args[0];
+
+    // Instantiate appropriate HTML element for context
+    if (typeof el === 'string') {
+        div = document.createElement('div');
+        div.innerHTML = args.shift();
+        el = div.firstChild;
+    } else if (el && el.tagName) {
+        args.shift();
+    }
+
+    ctx = new Context(el);
+
+    // Apply any controllers passed to createContext
+    if (args.length) {
+        ctx.use.apply(ctx, args);
+    }
+
+    return ctx;
 }
 
 /********************
@@ -41,10 +61,10 @@ function createModel(url) {
  *  API  *
  *********/
 
-var ascot = {
-    createContext : createContext,
-    createModel   : createModel
-};
+var ascot = createContext;
+
+ascot.createContext = createContext;
+ascot.createModel   = createModel;
 
 /*************
  *  Exports  *

@@ -1,6 +1,6 @@
 {
   "name"    : "ascot2",
-  "version" : "0.0.8",
+  "version" : "0.0.9",
   "main"    : "scripts/ascot.js",
   "devDependencies": {
     "grunt"                 : "~0.4.1",

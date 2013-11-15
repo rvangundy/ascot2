@@ -16,20 +16,32 @@ var Model   = require('./Model');
  * @param {Element} element An HTML element
  */
 function createContext(/* arguments */) {
-    var ctx, div;
+    var div;
     var args = Array.prototype.slice.call(arguments, 0);
     var el   = args[0];
+    var ctx  = Context.getByElement(el);
 
-    // Instantiate appropriate HTML element for context
-    if (typeof el === 'string') {
-        div = document.createElement('div');
-        div.innerHTML = args.shift();
-        el = div.firstChild;
-    } else if (el && el.tagName) {
-        args.shift();
+    // Use an existing context
+    if (ctx) { args.shift(); }
+
+    // Create a new context
+    else {
+        // Instantiate appropriate HTML element for context
+        if (typeof el === 'string') {
+            div = document.createElement('div');
+            div.innerHTML = args.shift();
+            el = div.firstChild;
+
+        // Use the passed element
+        } else if (el && el.tagName) {
+            args.shift();
+        }
+
+        // Create a new context without an element
+        else { el = null; }
+
+        ctx = new Context(el);
     }
-
-    ctx = new Context(el);
 
     // Apply any controllers passed to createContext
     if (args.length) {

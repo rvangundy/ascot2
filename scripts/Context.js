@@ -15,8 +15,17 @@ var defineAPI = require('./defineAPI');
  * @param {Function} controller A controller to use in this context
  */
 function use(/* arguments */) {
+    var element, frag;
     var controllers = Array.prototype.slice.call(arguments, 0);
-    var element     = this.element = this.element || document.createDocumentFragment();
+
+    // If no element exists, use a div tag and place in a fragment so event handlers register
+    if (!this.element) {
+        frag = document.createDocumentFragment();
+        element = this.element = document.createElement('div');
+        frag.appendChild(element);
+    } else {
+        element = this.element;
+    }
 
     // Call each controller
     for (var i = 0, len = controllers.length; i < len; i += 1) {
@@ -32,18 +41,29 @@ function use(/* arguments */) {
  * @param {Function} controller  A controller to use in this context
  * @return {Element}             The element or elements that have just been created
  */
-function add(innerHTML) {
-    var children;
-    var element = this.element = this.element || document.createDocumentFragment();
+function add(/* arguments */) {
+    var children, frag;
+    var child   = arguments[0];
     var args    = Array.prototype.slice.call(arguments, 1);
+    var element = this.element = this.element || this.use().element;
     var div     = document.createElement('div');
 
-    div.innerHTML = innerHTML;
-    children      = Array.prototype.slice.call(div.children, 0);
+    // Add view-controller
+    if (typeof child === 'function') {
+        frag = document.createDocumentFragment();
+        child(frag);
+        children = frag.childNodes;
+        element.appendChild(frag);
+    }
 
-    // Add all children to the parent element
-    for (var j = 0, lenJ = children.length; j < lenJ; j += 1) {
-        element.appendChild(children[j]);
+    // Add string HTML
+    else {
+        div.innerHTML = child.trim();
+        children      = Array.prototype.slice.call(div.children, 0);
+
+        for (var j = 0, lenJ = children.length; j < lenJ; j += 1) {
+            element.appendChild(children[j]);
+        }
     }
 
     // Call 'use' on each added element
@@ -60,11 +80,6 @@ function add(innerHTML) {
  */
 function appendTo(target) {
     target.appendChild(this.element);
-
-    // Test if element is a fragment and set this context's element to be the target
-    if (!this.element.tagName) {
-        this.element = target;
-    }
 
     return this;
 }
@@ -98,13 +113,6 @@ function mergeElements(innerHTML) {
     var newElement, attributes, attr, classList, children;
     var element = this.element;
     var div     = document.createElement('div');
-
-    // Handle fragments
-    if (!element.tagName) {
-        div.innerHTML = innerHTML;
-        element.appendChild(div.firstChild);
-        return;
-    }
 
     // Merge elements
     div.innerHTML = innerHTML;
@@ -182,7 +190,7 @@ function getAttribute(name) {
  *****************/
 
 var Context = function (element) {
-    this.element = element || document.createDocumentFragment();
+    this.element = element || document.createElement('div');
 };
 
 /***************

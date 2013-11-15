@@ -6,6 +6,53 @@
 
 var defineAPI = require('./defineAPI');
 
+/****************
+ *  Collection  *
+ ****************/
+
+/**
+ * A key/value pair collection that uses an HTML element as the key
+ * @type {Object}
+ */
+var COLLECTION = {
+    contexts : [],
+    elements : [],
+    add : function(context) {
+        this.contexts.push(context);
+        this.elements.push(context.element);
+    },
+    remove : function(context) {
+        var index = this.contexts.indexOf(context);
+
+        if (index >= 0) {
+            this.contexts.splice(index, 1);
+            this.elements.splice(index, 1);
+        }
+    },
+    seek : function(element) {
+        var index = this.elements.indexOf(element);
+
+        if (index >= 0) { return this.contexts[index]; }
+    }
+};
+
+/**
+ * Seeks and returns a context by element if it exists.
+ * @param {Element} element The element whose context to retrieve
+ * @return {Context} The context object corresponding to the passed element
+ */
+function getContextByElement(element) {
+    return COLLECTION.seek(element);
+}
+
+/**
+ * Removes a context from the collection
+ * @param {Context} context The context to remove
+ */
+function removeContext() {
+    COLLECTION.remove(this);
+}
+
 /*****************
  *  Composition  *
  *****************/
@@ -191,7 +238,14 @@ function getAttribute(name) {
 
 var Context = function (element) {
     this.element = element || document.createElement('div');
+    COLLECTION.add(this);
 };
+
+/************
+ *  Static  *
+ ************/
+
+Context.getByElement = getContextByElement;
 
 /***************
  *  Prototype  *
@@ -203,6 +257,7 @@ Context.prototype = defineAPI({
     appendTo     : appendTo,
     insertBefore : insertBefore,
     remove       : remove,
+    destroy      : removeContext,
     select       : select,
     selectAll    : selectAll,
     attr         : getAttribute,

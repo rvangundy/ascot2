@@ -21,7 +21,9 @@ describe('Context', function() {
     app.use(function(el) {
         var ctx = ascot.createContext(el);
 
-        ctx.add('<div class="top"></div>', function(el) {
+        ctx.merge('<div class="top"></div>');
+
+        ctx.use(function(el) {
             var ctx = ascot.createContext(el);
 
             ctx.add('<h1 class="testH1">Hello World!</h1>');
@@ -36,10 +38,6 @@ describe('Context', function() {
     app.appendTo(document.body);
 
     describe('use() & add()', function() {
-
-        it('should deploy to the document body', function() {
-            assert.equal(app.element, document.body);
-        });
 
         it('should add a new element to the DOM', function() {
             var h1 = document.body.querySelector('.testH1');

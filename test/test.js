@@ -38,7 +38,7 @@ describe('Context', function() {
     app.appendTo(document.body);
 
     describe('createContext()', function() {
-        ascot.createContext('<div class="test">', function(el) {
+        ascot('<div class="test">', function(el) {
             it('should create a new element and apply controllers', function() {
                 assert.ok(el.classList.contains('test'));
             });

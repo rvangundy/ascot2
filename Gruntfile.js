@@ -4,6 +4,7 @@ module.exports = function (grunt) {
     require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
     grunt.initConfig({
+        pkg: grunt.file.readJSON('package.json'),
         jshint: {
             options: {
                 jshintrc: '.jshintrc'
@@ -50,7 +51,7 @@ module.exports = function (grunt) {
                 tagName            : 'v%VERSION%',
                 tagMessage         : 'Version %VERSION%',
                 push               : true,
-                pushTo             : 'https://github.com/rvangundy/ascot2.git',
+                pushTo             : '<%= pkg.repository.url %>',
                 gitDescribeOptions : '--tags --always --abbrev=1 --dirty=-d'
             }
         },

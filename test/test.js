@@ -16,19 +16,19 @@ var sampleData = {
 
 describe('Context', function() {
     var ascot = require('../scripts/ascot.js');
-    var app   = ascot.createContext();
+    var app   = ascot();
 
     app.use(function(el) {
-        var ctx = ascot.createContext(el);
+        var ctx = ascot(el);
 
         ctx.merge('<div class="top"></div>');
 
         ctx.use(function(el) {
-            var ctx = ascot.createContext(el);
+            var ctx = ascot(el);
 
             ctx.add('<h1 class="testH1">Hello World!</h1>');
             ctx.add('<ul class="testUL"></ul>', function(el) {
-                var ctx = ascot.createContext(el);
+                var ctx = ascot(el);
 
                 ctx.add('<li>Hello</li><li>Ryan</li>');
             });
@@ -60,14 +60,14 @@ describe('Context', function() {
 
     describe('remove()', function() {
         it('should remove itself from its parent', function() {
-            ascot.createContext(document.body.querySelector('.top')).remove();
+            ascot(document.body.querySelector('.top')).remove();
             assert.notOk(document.body.querySelector('.top'));
         });
     });
 
     describe('merge()', function() {
         var el = document.createElement('div');
-        var ctx = ascot.createContext(el);
+        var ctx = ascot(el);
 
         el.classList.add('testA');
 
@@ -125,10 +125,10 @@ describe('Model', function() {
 
         it('should call bound controllers when models are updated', function(done) {
             var modelA = ascot.createModel('list.json');
-            var app = ascot.createContext();
+            var app = ascot();
 
             app.use(function(element) {
-                var ctx  = ascot.createContext(element);
+                var ctx  = ascot(element);
                 ctx.add('<ul></ul>', modelA.createController(function(element, model) {
                     assert.equal(element.tagName, 'UL');
                     assert.equal(model, modelA);

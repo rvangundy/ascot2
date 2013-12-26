@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>Ascot Test Suite</title>
+    <script src="../node_modules/mocha/mocha.js"></script>
+    <script src="../node_modules/chai/chai.js"></script>
+    <link rel="stylesheet" type="text/css" href="../node_modules/mocha/mocha.css">
+    <script type="text/javascript" charset="utf-8">
+        mocha.setup('bdd');
+    </script>
+</head>
+<body>
+    <div id="mocha"></div>
+    <script src="../.tmp/index.js" type="text/javascript" charset="utf-8"></script>
+    <!-- run mocha -->
+    <script type="text/javascript" charset="utf-8">
+        if (navigator.userAgent.indexOf('PhantomJS') < 0) {
+            mocha.run();
+        }
+    </script>
+</body>
+</html>

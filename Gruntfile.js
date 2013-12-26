@@ -23,14 +23,6 @@ module.exports = function (grunt) {
                 }
             }
         },
-        connect: {
-            test: {
-                options: {
-                    port: 8000,
-                    base: '.'
-                }
-            }
-        },
         browserify: {
             test: {
                 src  : ['test/test.js'],
@@ -55,25 +47,20 @@ module.exports = function (grunt) {
                 gitDescribeOptions : '--tags --always --abbrev=1 --dirty=-d'
             }
         },
-        open : {
-            test : {
-                path: 'http://localhost:8000/test',
-                app: 'Google Chrome'
-            }
-        },
-        watch: {
-            scripts: {
-                files: ['scripts/*.*', 'test/*.*'],
-                tasks: ['browserify:test']
+        mocha: {
+            options : {
+                run : true
+            },
+            test: {
+                src: ['test/test.html'],
             }
         }
     });
 
     grunt.registerTask('test', [
+        'jshint',
         'browserify',
-        'connect:test',
-        'open:test',
-        'watch'
+        'mocha'
     ]);
 
     grunt.registerTask('default', [
@@ -82,7 +69,7 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerTask('release', [
-        'jshint',
+        'test',
         'bump'
     ]);
 };

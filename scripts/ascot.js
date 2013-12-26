@@ -13,7 +13,6 @@ Array.isArray = Array.isArray || (Array.isArray = function(a){
  ******************/
 
 var Context = require('./Context');
-var Model   = require('./Model');
 
 /************************
  *  Context Handling  *
@@ -59,24 +58,6 @@ function createContext(/* arguments */) {
     return ctx;
 }
 
-/********************
- *  Model Handling  *
- ********************/
-
-var MODELS = {};
-
-/**
- * Creates or returns a model based on the passed url
- * @param {String} url The url pointing to the model's data resource
- */
-function createModel(url) {
-    if (MODELS[url]) { return MODELS[url]; }
-    else {
-        MODELS[url] = new Model(url);
-        return MODELS[url];
-    }
-}
-
 /*********
  *  API  *
  *********/
@@ -84,7 +65,6 @@ function createModel(url) {
 var ascot = createContext;
 
 ascot.createContext = createContext;
-ascot.createModel   = createModel;
 
 /*************
  *  Exports  *

@@ -1,4 +1,5 @@
 'use strict';
+// this is a test
 
 var assert = chai.assert;
 
